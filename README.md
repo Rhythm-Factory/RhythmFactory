@@ -1,9 +1,4 @@
 [![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-brightgreen)](https://github.com/sponsors/Rhythm-Factory)
-<<<<<<< HEAD
-=======
-
-# Rhythm Factory
->>>>>>> 83986291fbc17068cd4c95eb8bb8e2daaba4a9b4
 
 # Rhythm Factory
 
