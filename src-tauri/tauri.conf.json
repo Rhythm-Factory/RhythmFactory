@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "rhythmfactory",
   "version": "0.1.0",
-  "identifier": "com.cleverton.rhythmfactory",
+  "identifier": "com.tauri.dev",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173/",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Rhythm Factory",
+        "title": "Rhythm Factory App",
         "width": 800,
         "height": 600,
         "resizable": true,
