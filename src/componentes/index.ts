@@ -7,4 +7,3 @@ export { default as Highlight } from "./Highlight";
 export { default as Paragraph } from "./Paragraph";
 export { default as FeatureButton } from "./FeatureButton";
 export { default as Hero } from "./Hero";
-export { default as TopMusics } from "./TopMusics";
