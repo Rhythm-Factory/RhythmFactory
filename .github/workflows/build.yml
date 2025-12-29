@@ -10,107 +10,106 @@ permissions:
   contents: write
 
 jobs:
-    build-linux:
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@v4
+  update-version:
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.set-version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
 
-          - name: Instalar dependências do sistema
-            run: |
-              sudo apt update
-              sudo apt install -y \
-                libgtk-3-dev \
-                libwebkit2gtk-4.1-dev \
-                libappindicator3-dev \
-                librsvg2-dev \
-                patchelf \
-                pkg-config \
-                libglib2.0-dev
-            
-          - name: Instalar Node
-            uses: actions/setup-node@v4
-            with:
-                node-version: 18
+      - name: Pegar versão da tag
+        id: set-version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}  # remove "refs/tags/"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "::set-output name=version::$VERSION"
 
-          - name: Instalar dependências
-            run: npm install
+      - name: Atualizar tauri.conf.json
+        run: |
+          echo "Atualizando tauri.conf.json para a versão $VERSION"
+          jq --arg v "$VERSION" '.package.version = $v | .tauri.bundle.version = $v' src-tauri/tauri.conf.json > tmp.json
+          mv tmp.json src-tauri/tauri.conf.json
 
-          - name: Build frontend
-            run: npm run build
+  build-linux:
+    runs-on: ubuntu-latest
+    needs: update-version
+    steps:
+      - uses: actions/checkout@v4
 
-          - name: Build Tauri
-            run: npm run tauri build
+      - name: Instalar dependências do sistema
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            libgtk-3-dev \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            pkg-config \
+            libglib2.0-dev
+        
+      - name: Instalar Node
+        uses: actions/setup-node@v4
+        with:
+            node-version: 18
 
-          - name: Upload Linux artifact
-            uses: actions/upload-artifact@v4
-            with:
-              name: linux-build
-              path: src-tauri/target/release/bundle/appimage/*.AppImage
+      - name: Instalar dependências
+        run: npm install
 
-    build-windows:
-        runs-on: windows-latest
-        steps:
-          - uses: actions/checkout@v4
+      - name: Build frontend
+        run: npm run build
 
-          - name: Instalar Node
-            uses: actions/setup-node@v4
-            with:
-                node-version: 18
+      - name: Build Tauri
+        run: npm run tauri build
 
-          - name: Instalar dependências
-            run: npm install
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-build
+          path: src-tauri/target/release/bundle/appimage/*.AppImage
 
-          - name: Build frontend
-            run: npm run build
+  build-windows:
+    runs-on: windows-latest
+    needs: update-version
+    steps:
+      - uses: actions/checkout@v4
 
-          - name: Build Tauri
-            run: npm run tauri build
+      - name: Instalar Node
+        uses: actions/setup-node@v4
+        with:
+            node-version: 18
 
-          - name: Upload app do Windows
-            uses: actions/upload-artifact@v4
-            with:
-              name: windows-build
-              path: src-tauri/target/release/bundle/**/*.exe
+      - name: Instalar dependências
+        run: npm install
 
-    build-mac:
-        runs-on: macos-latest
-        steps:
-          - uses: actions/checkout@v4
+      - name: Build frontend
+        run: npm run build
 
-          - name: Instalar Node
-            uses: actions/setup-node@v4
-            with:
-                node-version: 18
+      - name: Atualizar tauri.conf.json no Windows
+        run: |
+          powershell -Command "(Get-Content src-tauri/tauri.conf.json) | ConvertFrom-Json | ForEach-Object { $_.package.version = '${{ needs.update-version.outputs.version }}'; $_.tauri.bundle.version = '${{ needs.update-version.outputs.version }}'; $_ } | ConvertTo-Json -Compress | Set-Content src-tauri/tauri.conf.json"
 
-          - name: Instalar dependências
-            run: npm install
+      - name: Build Tauri
+        run: npm run tauri build
 
-          - name: Build frontend
-            run: npm run build
+      - name: Upload app do Windows
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: src-tauri/target/release/bundle/**/*.exe
 
-          - name: Build Tauri
-            run: npm run tauri build
-            
-          - name: Upload dmg do MacOS
-            uses: actions/upload-artifact@v4
-            with:
-              name: macos-build
-              path: src-tauri/target/release/bundle/dmg/*.dmg
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [build-windows, build-linux]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
 
-    release:
-        if: startsWith(github.ref, 'refs/tags/')
-        needs: [build-mac, build-windows, build-linux]
-        runs-on: ubuntu-latest
-
-        steps:
-          - name: Download artifacts
-            uses: actions/download-artifact@v4
-
-          - name: Criar Release
-            uses: softprops/action-gh-release@v2
-            with:
-              files: |
-                macos-build/**/*.dmg
-                windows-build/**/*.exe
-                linux-build/**/*.AppImage
-
+      - name: Criar Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            windows-build/**/*.exe
+            linux-build/**/*.AppImage
