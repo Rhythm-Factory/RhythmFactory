@@ -1,4 +1,5 @@
-[![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-brightgreen)](https://github.com/sponsors/Rhythm-Factory)
+[![Doe](https://img.shields.io/badge/Doa%C3%A7%C3%A3o-Open%20Collective-brightgreen?style=for-the-badge)](https://opencollective.com/rhythm_factory)
+
 
 # Rhythm Factory
 
