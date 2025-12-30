@@ -4,15 +4,15 @@
 // Este programa é licenciado sob a GNU GPLv3. 
 // Para mais detalhes, veja o arquivo LICENSE no repositório ou <https://www.gnu.org/licenses/>.
 
-
 import Highlight from "../componentes/Highlight";
+import Musics from "../componentes/Musics";
 
 export default function Dashboard({ nome }: { nome: string }) {
     return (
         <>
             <Highlight>Olá, {nome}!</Highlight>
             <p>Suas Músicas</p>
-            <br />
+            <Musics />
         </>
     );
 }
