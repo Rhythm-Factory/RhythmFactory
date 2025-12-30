@@ -1,4 +1,4 @@
-[![Doe](https://img.shields.io/badge/Doa%C3%A7%C3%A3o-Open%20Collective-blue?style=for-the-badge)](https://opencollective.com/rhythm_factory) [![Doe](https://img.shields.io/badge/Doa%C3%A7%C3%A3o-KoFi-red?style=for-the-badge)](https://opencollective.com/rhythm_factory)
+[![Doe](https://img.shields.io/badge/Doa%C3%A7%C3%A3o-Open%20Collective-blue?style=for-the-badge)](https://opencollective.com/rhythm_factory) [![Doe](https://img.shields.io/badge/Doa%C3%A7%C3%A3o-KoFi-red?style=for-the-badge)](https://ko-fi.com/rhythm_factory)
 
 
 # Rhythm Factory
